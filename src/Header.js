@@ -28,8 +28,3 @@ class Header extends React.Component {
 }
 
 export default withAuth0(Header);
-{/* if ({this.props.auth0.isAuthenticated} === True) {
-          <LogoutButton/>
-        }else {
-          <LoginButton/>
-        } */}
