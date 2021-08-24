@@ -3,6 +3,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './BestBooks.css';
 import axios from "axios";
 import Card from 'react-bootstrap/Card';
+import Jumbotron from 'react-bootstrap/Jumbotron';
+import { withAuth0 } from '@auth0/auth0-react';
 
 class MyFavoriteBooks extends React.Component {
 
@@ -15,15 +17,21 @@ constructor(props){
 }
 
 componentDidMount = async ()=>{
+  const { user } = this.props.auth0;
 
-let url= `${process.env.REACT_APP_DATABASE}`;
+  console.log(this.props.auth0);
+  let emailaddress = user.email;
+  console.log('email',emailaddress);
 
-let booksData = await axios.get(url);
 
+  // http://localhost:3001/books?email=AhmadQouraan@gmail.com
+let booksData = await axios.get(`${process.env.REACT_APP_DATABASE}/books?email=${emailaddress}`);
+console.log(booksData.data);
 
-this.setState({
+await this.setState({
   book:booksData.data
 })
+
 };
 
 
@@ -31,11 +39,22 @@ this.setState({
 
 
   render() {
+    console.log(this.state.book);
+
     return(
       <>
+    
+      <Jumbotron>
+        <h1> My Favorite Books</h1>
+        <p>
+        This is a collection of my favorite books
+        </p>
+      </Jumbotron>
+
+      <div>
       {this.state.book.length !== 0 ? ( this.state.book.map((item,i) => { 
 
-     return (
+return (
 
       <Card style={{ width: '18rem' }}>
   <Card.Body>
@@ -48,18 +67,15 @@ this.setState({
     </Card.Text>
   </Card.Body>
 </Card>
-    //   <Jumbotron>
-    //     <h1> {item.title}</h1>
-    //     <p>
-    //     {item.description}
-    //     </p>
-    //     <p> {item.email}</p>
-    //   </Jumbotron>
+     
+      
      )
   })
       ) :( <p> Not exist any Book </p> )
       
       }
+      
+</div>
       </>
       )}}
-export default MyFavoriteBooks;
+export default withAuth0(MyFavoriteBooks);

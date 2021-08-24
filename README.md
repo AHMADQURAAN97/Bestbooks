@@ -1,3 +1,16 @@
+
+
+
+Name of feature: lab12
+
+Estimate of time needed to complete: 2 hours
+
+Start time: 1pm
+
+Finish time: 6pm
+
+Actual time needed to complete: 3 hours
+
 # Start your own "Can of Books" App
 
 This repository has starter code to begin work on creating your own online bookshelf.
