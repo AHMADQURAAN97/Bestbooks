@@ -5,6 +5,7 @@ import axios from "axios";
 import Card from 'react-bootstrap/Card';
 import Jumbotron from 'react-bootstrap/Jumbotron';
 import { withAuth0 } from '@auth0/auth0-react';
+import { Form, Button } from "react-bootstrap/";
 
 class MyFavoriteBooks extends React.Component {
 
@@ -36,6 +37,17 @@ await this.setState({
 
 
 
+addBook = async(event)=> {
+
+  event.preventDefault();
+    
+  let title = event.target.title.value;
+
+  let description = event.target.description.value;
+
+};
+
+
 
 
   render() {
@@ -43,7 +55,28 @@ await this.setState({
 
     return(
       <>
-    
+    <div>
+    <Form  onSubmit={this.addBook}>
+          <Form.Group>
+            <Form.Control
+              className="mb-2"
+              type="text"
+              placeholder="Book name"
+              name="title"
+            />
+
+            <Form.Control
+              className="mb-2"
+              type="text"
+              placeholder="Book description"
+              name="description"
+            />
+          </Form.Group>
+          <Button type="submit"  variant="primary">
+              Add book
+            </Button>
+        </Form>
+    </div>
       <Jumbotron>
         <h1> My Favorite Books</h1>
         <p>
@@ -74,8 +107,10 @@ return (
       ) :( <p> Not exist any Book </p> )
       
       }
+     
       
 </div>
+    
       </>
       )}}
 export default withAuth0(MyFavoriteBooks);
