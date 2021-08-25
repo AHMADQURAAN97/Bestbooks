@@ -5,17 +5,19 @@ import axios from "axios";
 import Card from 'react-bootstrap/Card';
 import Jumbotron from 'react-bootstrap/Jumbotron';
 import { withAuth0 } from '@auth0/auth0-react';
-import { Form, Button } from "react-bootstrap/";
+import { Form, Button, ThemeProvider } from "react-bootstrap/";
 
 class MyFavoriteBooks extends React.Component {
 
 
 constructor(props){
   super(props);
-  this.state = {
-    book:[]
-  }
+  this.state = ({
+    book:[],
+  })
 }
+
+// ====================================== GetBook Function=====================
 
 componentDidMount = async ()=>{
   const { user } = this.props.auth0;
@@ -30,22 +32,53 @@ let booksData = await axios.get(`${process.env.REACT_APP_DATABASE}/books?email=$
 console.log(booksData.data);
 
 await this.setState({
-  book:booksData.data
+  book:booksData.data,
 })
 
 };
 
+// ========================================== addBook function ============================
+
+addbook = async (e)=> {
+
+  e.preventDefault();
+  const { user } = this.props.auth0;
+
+  let bookInfo = {
+    email:user.email,
+   title: e.target.title.value,
+   description: e.target.description.value,
+   status:" "
+  }
+
+let bookInfoData = await axios.post(`${process.env.REACT_APP_DATABASE}/addbook`,bookInfo)
+console.log("boooookInfo",bookInfoData);
+
+  await this.setState ({
+  book:bookInfoData.data ,
+})
 
 
-addBook = async(event)=> {
-
-  event.preventDefault();
-    
-  let title = event.target.title.value;
-
-  let description = event.target.description.value;
 
 };
+
+// ======================================Delete Function==================
+
+deleteBook = async (id) => {
+  const { user } = this.props.auth0;
+
+  let paramsObj = {
+    email: user.email,
+  };
+
+  let resData = await axios.delete(`${process.env.REACT_APP_DATABASE}/deletebook/${id}`, { params: paramsObj });
+
+
+  this.setState ({
+    book:resData.data,
+  })
+}
+
 
 
 
@@ -56,7 +89,7 @@ addBook = async(event)=> {
     return(
       <>
     <div>
-    <Form  onSubmit={this.addBook}>
+    <Form  onSubmit={this.addbook}>
           <Form.Group>
             <Form.Control
               className="mb-2"
@@ -71,11 +104,12 @@ addBook = async(event)=> {
               placeholder="Book description"
               name="description"
             />
+            <input type="submit" value="Add Book" />
           </Form.Group>
-          <Button type="submit"  variant="primary">
-              Add book
-            </Button>
+          
         </Form>
+
+
     </div>
       <Jumbotron>
         <h1> My Favorite Books</h1>
@@ -85,11 +119,30 @@ addBook = async(event)=> {
       </Jumbotron>
 
       <div>
-      {this.state.book.length !== 0 ? ( this.state.book.map((item,i) => { 
+       
+      {this.state.book.length !== 0 && this.state.book.map((item,i) => { 
 
 return (
 
-      <Card style={{ width: '18rem' }}>
+  <li key={i}>
+  <h4> {item.title}</h4>
+  <p>{item.description}</p>
+  <p>{item.email}</p>
+  <Button variant="bottom" variant="danger" onClick={() => this.deleteBook(i)}>
+  Delete 
+        </Button>
+ 
+</li>
+      )})}
+      </div>
+      </>
+    
+      )}}
+  
+export default withAuth0(MyFavoriteBooks);
+
+
+{/* <Card key={i} style={{ width: '18rem' }}>
   <Card.Body>
     <Card.Title>{item.title}</Card.Title>
     <Card.Text>
@@ -99,18 +152,6 @@ return (
     {item.email}
     </Card.Text>
   </Card.Body>
-</Card>
-     
-      
-     )
-  })
-      ) :( <p> Not exist any Book </p> )
-      
-      }
-     
-      
-</div>
-    
-      </>
-      )}}
-export default withAuth0(MyFavoriteBooks);
+</Card> */}
+
+
