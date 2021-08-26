@@ -12,6 +12,8 @@ class MyFavoriteBooks extends React.Component {
     super(props);
     this.state = {
       book: [],
+      selectedBook:{},
+      showUpdateForm: false,
     };
   }
 
@@ -78,6 +80,44 @@ class MyFavoriteBooks extends React.Component {
     
   };
  
+  // ======================================Update Function================= 
+
+  updateBook = async (bookID) => { 
+    await this.setState({
+
+      showUpdateForm:false,
+    })
+    
+    let choosenBook=this.state.book.find(item => {
+
+     return item._id === bookID;
+    })
+
+    this.setState({
+
+      selectedBook:choosenBook,
+      showUpdateForm:true,
+    })
+console.log({choosenBook})
+  }
+
+  updateBookInfo = async (e) => { 
+
+    e.preventDefault();
+
+    let bookData ={
+
+    title : e.target.title.value,
+    description : e.target.description.value
+  }
+  let booksDataa = await axios.put(`${process.env.REACT_APP_DATABASE}/updatebook`,bookData);
+
+  this.setState ({
+    book:booksDataa.data
+  })
+
+  }
+
   render() {
     
 
@@ -103,11 +143,36 @@ class MyFavoriteBooks extends React.Component {
             </Form.Group>
           </Form>
         </div>
+
         <Jumbotron>
           <h1> My Favorite Books</h1>
           <p>This is a collection of my favorite books</p>
         </Jumbotron>
+       <div>
 
+         {this.state.showUpdateForm && 
+      <Form onSubmit={this.updateBookInfo}>
+      <Form.Group>
+      <Form.Control
+       className="mb-2"
+       type="text"
+       defaultValue={this.state.selectedBook.title}
+       name="title"
+        />
+
+      <Form.Control
+       className="mb-2"
+       type="text"
+       defaultValue={this.state.selectedBook.description}
+       name="description"
+        />
+   <input type="submit" value="Update" />
+ </Form.Group>
+</Form>
+         }
+
+
+        </div>
         <div>
           {this.state.book.length !== 0 ? (
             this.state.book.map((item, i) => {
@@ -123,6 +188,14 @@ class MyFavoriteBooks extends React.Component {
                   >
                     Delete
                   </Button>
+
+                  <Button
+                    variant="bottom"
+                    variant="danger"
+                    onClick={() => this.updateBook(item._id)}
+                  >
+                    Update Book
+                  </Button>
                 </li>
               );
             })
@@ -130,6 +203,9 @@ class MyFavoriteBooks extends React.Component {
             <p> Not exist any Book </p>
           )}
         </div>
+
+ 
+
       </>
     );
   }
