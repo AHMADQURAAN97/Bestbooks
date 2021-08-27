@@ -86,7 +86,7 @@ class MyFavoriteBooks extends React.Component {
     await this.setState({
 
       showUpdateForm:false,
-    })
+    });
     
     let choosenBook=this.state.book.find(item => {
 
@@ -98,25 +98,28 @@ class MyFavoriteBooks extends React.Component {
       selectedBook:choosenBook,
       showUpdateForm:true,
     })
-console.log({choosenBook})
-  }
+console.log("choooosenbook",{choosenBook})
+  };
 
   updateBookInfo = async (e) => { 
+    const { user } = this.props.auth0;
 
     e.preventDefault();
 
     let bookData ={
 
     title : e.target.title.value,
-    description : e.target.description.value
+    description : e.target.description.value,
+    email:user.email
   }
-  let booksDataa = await axios.put(`${process.env.REACT_APP_DATABASE}/updatebook`,bookData);
+  let bookID = this.state.selectedBook._id
+  let booksDataa = await axios.put(`${process.env.REACT_APP_DATABASE}/updatebook/${bookID}`,bookData);
 
   this.setState ({
     book:booksDataa.data
   })
 
-  }
+  };
 
   render() {
     
