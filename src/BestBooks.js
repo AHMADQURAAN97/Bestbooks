@@ -14,6 +14,7 @@ class MyFavoriteBooks extends React.Component {
       book: [],
       selectedBook:{},
       showUpdateForm: false,
+      bookObj:{}
     };
   }
 
@@ -22,17 +23,17 @@ class MyFavoriteBooks extends React.Component {
   componentDidMount = async () => {
     const { user } = this.props.auth0;
 
-    console.log(this.props.auth0);
+    // console.log(this.props.auth0);
     let emailaddress = user.email;
-    console.log("email", emailaddress);
+    // console.log("email", emailaddress);
 
-    // http://localhost:3001/books?email=AhmadQouraan@gmail.com
+    // http://localhost:3001/books?email=ahmadqouraan@gmail.com
     let booksData = await axios.get(
       `${process.env.REACT_APP_DATABASE}/books?email=${emailaddress}`
     );
     console.log(booksData.data);
 
-     this.setState({
+    await this.setState({
       book: booksData.data,
     });
   };
@@ -55,19 +56,19 @@ class MyFavoriteBooks extends React.Component {
     );
     console.log("boooookInfo", bookInfoData);
 
-
- 
-     this.setState({
-      book: [...this.state.book , bookInfoData.data]
+    await this.setState({
+      book:bookInfoData.data
+      
     });
+  //  await (bookInfoData.data).push(this.state.book);
+  //   this.componentDidMount();
+    // [...this.state.book , bookInfoData.data],
   };
 
   // ======================================Delete Function==================
 
    deleteBook = async (bookID) => {
     const { user } = this.props.auth0;
-
-   
 
     let resData = await axios.delete(
       `${process.env.REACT_APP_DATABASE}/deletebook/${bookID}?email=${user.email}`
@@ -86,7 +87,7 @@ class MyFavoriteBooks extends React.Component {
     await this.setState({
 
       showUpdateForm:false,
-    })
+    });
     
     let choosenBook=this.state.book.find(item => {
 
@@ -98,33 +99,44 @@ class MyFavoriteBooks extends React.Component {
       selectedBook:choosenBook,
       showUpdateForm:true,
     })
-console.log({choosenBook})
-  }
+console.log("choooosenbook",{choosenBook})
+  };
 
   updateBookInfo = async (e) => { 
+    const { user } = this.props.auth0;
 
     e.preventDefault();
 
     let bookData ={
 
     title : e.target.title.value,
-    description : e.target.description.value
+    description : e.target.description.value,
+    email:user.email
   }
-  let booksDataa = await axios.put(`${process.env.REACT_APP_DATABASE}/updatebook`,bookData);
+  let bookID = this.state.selectedBook._id
+  let booksDataa = await axios.put(`${process.env.REACT_APP_DATABASE}/updatebook/${bookID}`,bookData);
 
   this.setState ({
     book:booksDataa.data
   })
 
-  }
+  };
 
   render() {
     
 
     return (
       <>
+        
+
+        <Jumbotron>
+          <h1> My Favorite Books</h1>
+          <p>This is a collection of my favorite books</p>
+        </Jumbotron>
+
+
         <div>
-          <Form onSubmit={this.addbook}>
+          {<Form onSubmit={this.addbook}>
             <Form.Group>
               <Form.Control
                 className="mb-2"
@@ -141,13 +153,9 @@ console.log({choosenBook})
               />
               <input type="submit" value="Add Book" />
             </Form.Group>
-          </Form>
+          </Form>}
         </div>
 
-        <Jumbotron>
-          <h1> My Favorite Books</h1>
-          <p>This is a collection of my favorite books</p>
-        </Jumbotron>
        <div>
 
          {this.state.showUpdateForm && 
